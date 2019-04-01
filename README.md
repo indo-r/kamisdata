@@ -10,8 +10,19 @@ Program pekanan Kamis Data dari komunitas R Indonesia
 3. Buat direktori baru dengan nama 'vignettes'
 4. Skrip untuk mendapatkan data tersedia dalam direktori 'data-raw'. Anda dapat menggunakan skrip tersebut atau langsung menggunakan data berekstensi `*.rda` dalam direktori 'data'. **Jangan mengubah nama berkas dalam folder data-raw!**
 5. Silakan lakukan eksplorasi dan analisis data dengan menggunakan  dokumen Rmarkdown dan simpan dengan format 'nama_analis-judul.Rmd*' di dalam folder 'vignettes'
-6. Pada hari rabu pekan berikutnya, silakan mengajukan *Pull request* atas hasil kerja Anda
-7. Selamat mencoba!
+6. Tuliskan nama paket yang Anda perlukan ke dalam berkas `install.R` pada bagian `pacman::p_load()` (kecuali untuk paket `tidyverse`, `shiny`, dan `devtools`)
+7. Pada hari rabu pekan berikutnya, silakan mengajukan *Pull request* atas hasil kerja Anda
+8. Selamat mencoba!
 
 ## Menggunakan Binder
 Anda dapat klik pada tautan [ini](https://mybinder.org/v2/gh/indo-r/kamidata/master?urlpath=rstudio) untuk menjalankan binder!
+
+## Kontribusi
+Anda memiliki dataset yang menarik? Silakan kontak [Muhammad Aswan Syahputra](https://t.me/aswansyahputra) jika Anda ingin menyumbangkan data tersebut untuk program Kamis Data selanjutnya!
+
+## Lisensi
+
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This
+work is licensed under a
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
+Commons Attribution-ShareAlike 4.0 International License</a>.
