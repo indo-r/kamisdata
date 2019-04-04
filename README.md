@@ -1,4 +1,4 @@
-# Kamisdata R Indonesia
+# Kamis Data R Indonesia
 [![Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)
 
 Program pekanan Kamis Data dari komunitas R Indonesia
