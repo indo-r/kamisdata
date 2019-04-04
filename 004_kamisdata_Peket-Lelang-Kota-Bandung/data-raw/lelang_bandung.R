@@ -1,5 +1,5 @@
 library(tidyverse)
-# remotes::install_github("aswansyahputra/bandungjuara)
+# remotes::install_github("aswansyahputra/bandungjuara")
 library(bandungjuara)
 
 lelang_bandung <- 
