@@ -15,6 +15,7 @@ Program pekanan Kamis Data dari komunitas R Indonesia
 
 ## Menggunakan Binder
 Anda dapat klik pada tautan [ini](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio) untuk menjalankan binder!
+![](https://media.giphy.com/media/ZaQCtQtTNqKUXGAyIr/giphy.gif)
 
 ## Kontribusi
 Anda memiliki dataset yang menarik? Silakan kontak [Muhammad Aswan Syahputra](https://t.me/aswansyahputra) jika Anda ingin menyumbangkan data tersebut untuk program Kamis Data selanjutnya!
