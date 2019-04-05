@@ -14,8 +14,10 @@ Program pekanan Kamis Data dari komunitas R Indonesia
 7. Selamat mencoba!
 
 ## Menggunakan Binder
-Anda dapat klik pada tautan [ini](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio) untuk menjalankan binder!
-![](https://media.giphy.com/media/ZaQCtQtTNqKUXGAyIr/giphy.gif)
+Anda dapat melakukan analisis data atau mempelajari skrip analisis data yang telah dibuat langsung dari peramban dengan menggunakan *binder*. Anda tidak perlu mengunduh/klon repositori ini atau memasang RStudio terlebih dahulu untuk menjalankan *binder*, klik
+pada tautan [ini](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)!
+
+![](kamisdata_binder.gif)
 
 ## Kontribusi
 Anda memiliki dataset yang menarik? Silakan kontak [Muhammad Aswan Syahputra](https://t.me/aswansyahputra) jika Anda ingin menyumbangkan data tersebut untuk program Kamis Data selanjutnya!
