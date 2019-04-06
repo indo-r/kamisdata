@@ -3,7 +3,7 @@
 
 Program pekanan Kamis Data dari komunitas R Indonesia
 
-## Aturan main
+## Cara Berpartisipasi
 
 1. *Fork* repositori ini
 2. Pilih topik dan direktori kamisdata yang Anda inginkan
@@ -14,8 +14,7 @@ Program pekanan Kamis Data dari komunitas R Indonesia
 7. Selamat mencoba!
 
 ## Menggunakan Binder
-Anda dapat melakukan analisis data atau mempelajari skrip analisis data yang telah dibuat langsung dari peramban dengan menggunakan *binder*. Anda tidak perlu mengunduh/klon repositori ini atau memasang RStudio terlebih dahulu untuk menjalankan *binder*, klik
-pada tautan [ini](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)!
+Anda dapat melakukan analisis data atau mempelajari skrip analisis data yang telah dibuat langsung dari peramban dengan menggunakan *binder*. Anda tidak perlu mengunduh/klon repositori ini atau memasang RStudio terlebih dahulu untuk menjalankan *binder*, cukup klik >> [![Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)!
 
 ![](kamisdata_binder.gif)
 
@@ -24,7 +23,16 @@ Anda memiliki dataset yang menarik? Silakan kontak [Muhammad Aswan Syahputra](ht
 
 ## Lisensi
 
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />This
-work is licensed under a
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative
-Commons Attribution-ShareAlike 4.0 International License</a>.
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br />Program Kamis Data ini memiliki lisensi
+<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Atribusi-BerbagiSerupa 4.0 Internasional (CC BY-SA 4.0)</a>.
+
+**Anda diperbolehkan:**
+
++ **Berbagi** — menyalin dan menyebarluaskan kembali materi ini dalam bentuk atau format apapun;
++ **Adaptasi** — menggubah, mengubah, dan membuat turunan dari materi ini untuk kepentingan apapun, termasuk kepentingan komersial. 
+
+**Berdasarkan ketentuan berikut:**
+
++ **Atribusi** — Anda harus mencantumkan nama yang sesuai, mencantumkan tautan terhadap lisensi, dan menyatakan bahwa telah ada perubahan yang dilakukan. Anda dapat melakukan hal ini dengan cara yang sesuai, namun tidak mengisyaratkan bahwa pemberi lisensi mendukung Anda atau penggunaan Anda.
++ **BerbagiSerupa** — Apabila Anda menggubah, mengubah, atau membuat turunan dari materi ini, Anda harus menyebarluaskan kontribusi Anda di bawah lisensi yang sama dengan materi asli. 
+    
