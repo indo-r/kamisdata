@@ -25,7 +25,7 @@ url_perkara_pidana <-
 save(url_perkara_pidana, file = "005_kamisdata_Perkara-Pidana-Umum-Kejari/data/url_perkara_pidana.rda", compress = "bzip2", compression_level = 9)
 
 perkara_pidana <- 
-  future_map_dfr(all_url, ~read_html(.x) %>% 
+  future_map_dfr(all_perkara_pidana, ~read_html(.x) %>% 
                    html_node("td[class = 'teks'] table") %>% 
                    html_table(trim = TRUE) %>% 
                    as_tibble() %>% 
