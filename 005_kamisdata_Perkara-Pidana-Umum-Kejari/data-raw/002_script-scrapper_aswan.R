@@ -1,4 +1,4 @@
-# Script scrapper ini adalah modifikasi dari script original milik Raden Muhammad Hadi, sebagai bahan untuk belajar oleh Muhammad Aswan Syahputra dan dikarenakan berkas 'data_perdata_umum_per_dokumen (1).rda' gagal untuk dibuka
+# Script scrapper ini adalah modifikasi dari script original milik Raden Muhammad Hadi, sebagai bahan untuk belajar oleh Muhammad Aswan Syahputra
 
 library(tidyverse)
 library(rvest)
@@ -9,7 +9,7 @@ plan(multiprocess)
 url_part1 <- "https://www.kejaksaan.go.id/infoperkara.php?idu=0&idsu=11&bln=0&thn=0&hal="
 url_part2 <- "&sec=pid&pk=200383541198322594166386550&ss=c99ef3668e6861ed23f95e676ffb5727&bc=&act=search&skey=&keyw="
 
-pages <- seq_len(1311) # jumlah halaman total dari laman https://www.kejaksaan.go.id/infoperkara.php?idu=0&idsu=11&sec=pid
+pages <- seq_len(1311) # jumlah halaman untuk total tabel dari laman https://www.kejaksaan.go.id/infoperkara.php?idu=0&idsu=11&sec=pid
 
 url_perkara_pidana <- 
   future_map_dfr(pages, ~str_c(url_part1, .x, url_part2) %>% 
