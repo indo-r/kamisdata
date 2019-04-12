@@ -95,3 +95,5 @@ for (i in 1:nrow(link_container)) {
     Sys.sleep(10)
   }
 }
+
+save(data_container4, file = "005_kamisdata_Perkara-Pidana-Umum-Kejari/data/perkara_pidana_per_dokumen.rda", compress = "bzip2", compression_level = 9)
