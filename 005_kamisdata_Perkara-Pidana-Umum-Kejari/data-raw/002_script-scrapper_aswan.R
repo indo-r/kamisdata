@@ -22,19 +22,54 @@ url_perkara_pidana <-
          .progress = TRUE) %>% 
   pull()
 
-save(url_perkara_pidana, file = "005_kamisdata_Perkara-Pidana-Umum-Kejari/data/url_perkara_pidana.rda", compress = "bzip2", compression_level = 9)
+# save(url_perkara_pidana, file = "005_kamisdata_Perkara-Pidana-Umum-Kejari/data/url_perkara_pidana.rda", compress = "bzip2", compression_level = 9)
 
-perkara_pidana <- 
-  future_map_dfr(all_perkara_pidana, ~read_html(.x) %>% 
-                   html_node("td[class = 'teks'] table") %>% 
-                   html_table(trim = TRUE) %>% 
-                   as_tibble() %>% 
-                   filter(X1 != "" & X1 != "DETIL DATA PERKARA TINDAK PIDANA UMUM") %>% 
-                   select(-X2) %>% 
-                   slice(1:8) %>% 
-                   spread(X1, X3, drop = FALSE) %>% 
-                   janitor::clean_names(), 
-                 .progress = TRUE)
+safe_scrape <- 
+  future_map(url_perkara_pidana, safely(
+    ~read_html(.x) %>% 
+      html_node("td[class = 'teks'] table") %>% 
+      html_table(trim = TRUE) %>% 
+      as_tibble() %>% 
+      filter(X1 != "" & X1 != "DETIL DATA PERKARA TINDAK PIDANA UMUM") %>% 
+      transmute(
+        key = as.factor(X1),
+        value = X3
+      ) %>% 
+      spread(key, value) %>% 
+      janitor::clean_names()
+  ), 
+  .progress = TRUE)
+
+perkara_pidana <-
+  safe_scrape %>%
+  map_dfr("result") %>%
+  mutate_all( ~ na_if(.x, "")) %>%
+  mutate_all( ~ na_if(.x, "-")) %>%
+  select(
+    no_perkara,
+    jenis_perkara,
+    wilayah_hukum,
+    no_surat,
+    kasus_posisi,
+    jpu,
+    surat_dakwaan,
+    tuntutan,
+    nama,
+    tempat_tgl_lahir,
+    jenis_kelamin,
+    warga_negara,
+    tempat_tinggal,
+    agama,
+    pekerjaan,
+    pendidikan,
+    pasal_yang_dibuktikan,
+    pasal_yang_di_dakwakan,
+    hal_hal_yang_memberatkan,
+    hal_hal_yang_meringankan,
+    tuntutan_pidana,
+    amar_putusan_pn,
+    status,
+    tanggal_eksekusi
+  )
 
 save(perkara_pidana, file = "005_kamisdata_Perkara-Pidana-Umum-Kejari/data/perkara_pidana.rda", compress = "bzip2", compression_level = 9)
-
