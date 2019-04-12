@@ -22,7 +22,7 @@ url_perkara_pidana <-
          .progress = TRUE) %>% 
   pull()
 
-# save(url_perkara_pidana, file = "005_kamisdata_Perkara-Pidana-Umum-Kejari/data/url_perkara_pidana.rda", compress = "bzip2", compression_level = 9)
+save(url_perkara_pidana, file = "005_kamisdata_Perkara-Pidana-Umum-Kejari/data/url_perkara_pidana.rda", compress = "bzip2", compression_level = 9)
 
 safe_scrape <- 
   future_map(url_perkara_pidana, safely(
