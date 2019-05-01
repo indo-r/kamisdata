@@ -2,7 +2,7 @@
 title: "Analisis Konten Debat Pilpres Pertama"
 author: "Sabhrina G. Aninta"
 date: "31 March 2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +14,8 @@ Untuk mendapatkan data transkripsi debat pilpres pertama, saya berusaha mengakse
 
 ```{r bacaTranskrip}
 library(dplyr)
-load("D:/Master/Rcourse/indo-r/003_kamisdata_Debat-Pilpres1-2019/data/debat-pilpres1-2019.rda")
+# load("D:/Master/Rcourse/indo-r/003_kamisdata_Debat-Pilpres1-2019/data/debat-pilpres1-2019.rda")
+load("../data/debat-pilpres1-2019.rda")
 glimpse(tks_debatcapres1_2019)
 
 ```

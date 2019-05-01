@@ -3,17 +3,11 @@ title: "Debat Pilpres 1 2019"
 author: "aswansyahputra"
 date: "4/4/2019"
 output: 
-  html_document: 
+  github_document: 
     fig_height: 6
     fig_width: 9
-    highlight: pygments
-    theme: flatly
-    toc: yes
-    toc_float: true
-    toc_collapsed: true
-    code_download: true
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 ---
 
 ```{r setup, include=FALSE}
