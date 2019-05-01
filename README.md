@@ -8,10 +8,12 @@ Program pekanan Kamis Data dari komunitas R Indonesia
 1. *Fork* repositori ini
 2. Pilih topik dan direktori kamisdata yang Anda inginkan
 3. Buat direktori baru dengan nama 'vignettes' dalam direktori topik yang Anda pilih
-4. Skrip untuk mendapatkan data tersedia dalam direktori 'data-raw'. Anda dapat menggunakan skrip tersebut atau langsung menggunakan data berekstensi `*.rda` dalam direktori 'data'. **Jangan mengubah nama berkas dalam folder data-raw!**
-5. Silakan lakukan eksplorasi dan analisis data dengan menggunakan  dokumen Rmarkdown dan simpan dengan format 'nama_analis-judul.Rmd*' di dalam folder 'vignettes'
-6. Pada hari rabu pekan berikutnya, silakan mengajukan *Pull request* atas hasil kerja Anda
-7. Selamat mencoba!
+4. Skrip untuk mendapatkan data tersedia dalam direktori 'data-raw'. Anda dapat menggunakan skrip tersebut atau langsung menggunakan data berekstensi `rda` dalam direktori 'data'. **Jangan mengubah nama berkas dalam folder data-raw!**
+5. Silakan lakukan eksplorasi dan analisis data dengan menggunakan  dokumen R Markdown dan simpan dengan format `analis_judul.Rmd` di dalam folder 'vignettes' (contoh: aswansyahputra_dashboard-penduduk-perkotaan.Rmd)
+6. Pada YAML R Markdown gunakan output `github_document`, terkecuali R Markdown tersebut tidak dapat di *render* menjadi dokumen markdown
+7. Pada hari rabu pekan berikutnya, silakan mengajukan *Pull request* atas hasil kerja Anda. Selamat mencoba!
+
+**Catatan:** Jika Anda sebelumnya telah melakukan *forking*, silakan ikuti panduan pada pranala [ini](https://digitaldrummerj.me/git-sync-fork-to-master/) untuk melakukan sinkronisasi repositori
 
 ## Menggunakan Binder
 Anda dapat melakukan analisis data atau mempelajari skrip analisis data yang telah dibuat langsung dari peramban dengan menggunakan *binder*. Anda tidak perlu mengunduh/klon repositori ini atau memasang RStudio terlebih dahulu untuk menjalankan *binder*, cukup klik >> [![Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)!

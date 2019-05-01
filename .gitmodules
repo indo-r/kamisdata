@@ -1,9 +1,0 @@
-[submodule "001_kamisdata_Persentase-Penduduk-Perkotaan"]
-	path = 001_kamisdata_Persentase-Penduduk-Perkotaan
-	url = https://github.com/indo-r/001_kamisdata_Persentase-Penduduk-Perkotaan.git
-[submodule "002_kamisdata_Caleg-DPR-2019"]
-	path = 002_kamisdata_Caleg-DPR-2019
-	url = https://github.com/indo-r/002_kamisdata_Caleg-DPR-2019.git
-[submodule "003_kamisdata_Debat-Pilpres1-2019"]
-	path = 003_kamisdata_Debat-Pilpres1-2019
-	url = https://github.com/indo-r/003_kamisdata_Debat-Pilpres1-2019.git
