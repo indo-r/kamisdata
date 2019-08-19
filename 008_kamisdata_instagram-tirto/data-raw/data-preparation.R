@@ -1,14 +1,8 @@
 library(jsonlite)
 library(tidyverse)
+library(lubridate)
 
 tirto_raw <- fromJSON("008_kamisdata_instagram-tirto/data-raw/tirtoid.json")
-
-jsonedit(tirto_raw, mode = "view")
-tirto_raw %>%
-  pluck(1) %>%
-  jsonlite::flatten() %>%
-  transpose() %>%
-  jsonedit()
 
 tirto_tbl <-
   tirto_raw %>%
@@ -45,7 +39,7 @@ tirto_extracted
 tirto_posts <-
   tirto_extracted %>%
   mutate(
-    post_time = as.POSIXct(post_time, origin = "1970-01-01"), # straighforward processing
+    post_time = as_datetime(post_time, tz = "Asia/Jakarta"), # straighforward processing
     caption = caption %>% str_remove_all("\\n") %>% str_trim(), # lengthly processing
     n_tags = map_int(tags, length), # map using one function with no arguments
     tags = map_chr(tags, ~ paste(.x, collapse = ", ")), # map using lamda function
@@ -59,11 +53,10 @@ save(tirto_posts, file = "008_kamisdata_instagram-tirto/data/tirto_posts.rda", c
 tirto_comments <-
   tirto_posts %>%
   unnest() %>% 
-  mutate_at(vars(ends_with("time")), ~ as.POSIXct(.x, origin = "1970-01-01")) %>%
+  mutate_at(vars(ends_with("time")), ~ as_datetime(.x, tz = "Asia/Jakarta")) %>%
   mutate_if(is.character, ~ .x %>%
               str_remove_all("\\n") %>%
               str_trim())
 tirto_comments
-
 
 save(tirto_comments, file = "008_kamisdata_instagram-tirto/data/tirto_comments.rda", compress = "bzip2", compression_level = 9)
