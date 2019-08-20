@@ -29,12 +29,12 @@ mcu_characters_raw <-
   set_names(nm = c("Hero", "Villain")) %>% 
   future_map(possibly(~scrape_mcu_character_in_category(.x), otherwise = NULL), .progress = TRUE)
 
-mcu_characters <- 
+mcu_characters <-
   mcu_characters_raw %>% 
   bind_rows(.id = "category") %>% 
   complete(id, key) %>% 
-  filter(!duplicated(.)) %>% 
-  filter(id != 78) %>% 
+  dplyr::filter(!duplicated(.)) %>% 
+  dplyr::filter(id != 78) %>% 
   drop_na(category) %>% 
   spread(key, value) %>% 
   janitor::clean_names() %>% 
@@ -58,7 +58,6 @@ mcu_characters <-
          title = title_s,
          affiliation, 
          citizenship,
-         age,
          date_of_birth,
          date_of_death, 
          species,
@@ -67,4 +66,4 @@ mcu_characters <-
          everything(), 
          -id)
 
-save(mcu_characters, file = "007_kamis-data_karakter-mcu/data/mcu_characters.rda", compress = "bzip2", compression_level = 9)
+save(mcu_characters, file = "007_kamisdata_karakter-mcu/data/mcu_characters.rda", compress = "bzip2", compression_level = 9)
