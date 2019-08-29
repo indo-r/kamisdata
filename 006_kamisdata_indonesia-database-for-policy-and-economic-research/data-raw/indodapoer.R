@@ -20,6 +20,8 @@ indodapoer <-
   clean_names() %>% 
   mutate(year = str_remove(year, "^x"))
 
-glimpse(indodapoer)
+indodapoer
 
 save(indodapoer, file = "006_kamisdata_indonesia-database-for-policy-and-economic-research/data/indodapoer.rda", compress = "bzip2", compression_level = 9)
+
+write_csv(indodapoer, "006_kamisdata_indonesia-database-for-policy-and-economic-research/data/indodapoer.csv")
