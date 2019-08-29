@@ -66,4 +66,8 @@ mcu_characters <-
          everything(), 
          -id)
 
+mcu_characters
+
 save(mcu_characters, file = "007_kamisdata_karakter-mcu/data/mcu_characters.rda", compress = "bzip2", compression_level = 9)
+
+write_csv(mcu_characters, "007_kamisdata_karakter-mcu/data/mcu_characters.csv")
