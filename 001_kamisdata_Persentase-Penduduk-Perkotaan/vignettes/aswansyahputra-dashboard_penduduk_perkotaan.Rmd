@@ -1,0 +1,84 @@
+---
+title: "Eksplorasi Data Penduduk Perkotaan"
+author: "aswansyahputra"
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: fill
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(readr)
+library(dplyr)
+library(forcats)
+library(ggplot2)
+# remotes::install_github('cttobin/ggthemr')
+library(ggthemr)
+```
+
+```{r global, include=FALSE}
+original <- read_csv("../data-raw/ae95c6a6-f607-4ddf-922e-c74d235b182b.csv")
+pddk_kota <- 
+  original %>% 
+  select(vervar, tahun, nilai) %>% 
+  rename(
+    lokasi = vervar,
+    persentase = nilai
+  ) %>% 
+  mutate(
+    persentase = persentase/100
+  )
+```
+
+
+Column 1 {.sidebar}
+--------------------
+
+### Pengaturan
+
+```{r}
+selectInput(
+  inputId = "tahun_awal", 
+  label = "Tahun Awal", 
+  choices = 2010:2019
+)
+
+selectInput(
+  inputId = "tahun_akhir", 
+  label = "Tahun Akhir", 
+  choices = 2011:2020
+)
+```
+
+Column 2 {data-width=700}
+--------------------
+
+### 
+
+```{r}
+renderPlot({
+  ggthemr("flat", layout = "clean", type = "outer")
+
+    pddk_kota %>% 
+    filter(tahun %in% c(input$tahun_awal, input$tahun_akhir)) %>% 
+    ggplot(aes(x = persentase, y = fct_reorder(lokasi, persentase))) +
+    geom_path(arrow = arrow(length = unit(0.15, "cm"))) +
+    geom_text(
+      aes(
+        label = 100*persentase,
+        hjust = if_else(tahun == input$tahun_awal, 1.25, -0.25)
+      ),
+      size = 4
+    ) +
+    scale_x_continuous(labels = scales::percent) +
+    labs(
+      x = "",
+      y = "",
+      title = "Pertumbuhan Persentase Penduduk Kota",
+      subtitle = paste("Data Persentase Penduduk Perkotaan", input$tahun_awal, "-", input$tahun_akhir),
+      caption = "Sumber: Portal Satu Data Indonesia (data.go.id)"
+    )
+})
+
+```
