@@ -1,5 +1,6 @@
 library(rvest)
 library(tidyverse)
+# remotes::install_github("moodymudskipper/unglue")
 library(unglue)
 
 filmindonesia <- read_html("http://filmindonesia.or.id/movie/viewer#.XWNJqXUzZtY")
