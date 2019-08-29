@@ -1,0 +1,244 @@
+---
+title: "Debat Pilpres 1 2019"
+author: "aswansyahputra"
+date: "4/4/2019"
+output: 
+  github_document: 
+    fig_height: 6
+    fig_width: 9
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+## Preparasi
+### Paket
+
+```{r}
+library(tidyverse)
+library(stopwords)
+```
+
+### Dataset
+```{r}
+load("../data/debat-pilpres1-2019.rda")
+glimpse(tks_debatcapres1_2019)
+
+tks_debatcapres1_2019 %>% 
+  distinct(penutur)  
+```
+
+### Stopwords
+```{r}
+stopwords_id <- stopwords(language = "id", source = "stopwords-iso")
+glimpse(stopwords_id)
+```
+
+## Frekuensi Kata
+
+```{r}
+frekuensi_kata <- 
+  tks_debatcapres1_2019 %>% 
+  mutate(
+    teks = str_to_lower(teks),
+    teks = str_remove_all(teks, pattern = "[:punct:]")
+  ) %>% 
+  separate_rows(teks, sep = " ") %>% 
+  filter(
+    teks != "",
+    !teks %in% stopwords_id
+  ) %>% 
+  count(penutur, teks, sort = TRUE
+  ) %>% 
+  group_by(penutur) %>% 
+  top_n(25, wt = n) %>% 
+  ungroup() %>% 
+  filter(n >= 3)
+
+frekuensi_kata
+```
+
+```{r}
+my_theme <- function() {
+   theme(
+    title = element_text(
+      family = "Manjari",
+      face = "bold",
+      size = 14,
+      colour = "grey90"
+    ),
+    axis.text = element_text(
+      family = "Manjari",
+      size = 11,
+      colour = "grey70"
+    ),
+    legend.text = element_text(
+      family = "Manjari",
+      size = 10,
+      colour = "grey70"
+    ),
+    axis.ticks = element_line(colour = "white"),
+    panel.grid.major = element_blank(), 
+    plot.background = element_rect(
+      fill = "#004e6f"
+    ), 
+    panel.background = element_rect(
+      fill = "#004e6f"
+    ),
+    legend.background = element_rect(
+      fill = "#004e6f"
+    )
+  )
+}
+```
+
+```{r}
+plot_kata <- function(data, penutur) {
+  
+  if (missing(data) | missing(penutur)) {
+    stop("Argumen yang Anda masukan belum lengkap.", call. = FALSE)
+  }
+  
+  if (!penutur %in% data[["penutur"]]) {
+    stop("Penutur yang Anda inginkan tidak ada di dalam daftar penutur.", call. = FALSE)
+  }
+  
+  data %>% 
+    filter(penutur == !!enquo(penutur)) %>% 
+    ggplot(aes(x = fct_reorder(teks, n), y = n)) +
+    geom_col(fill = "grey90", col = "grey60") +
+    coord_flip() +
+    labs(
+      title = paste("Frekuensi Penggunaan Kata oleh", penutur),
+      subtitle = "Debat Pilpres 1 pada 17 Januari 2019",
+      caption = "Sumber: debatcapres.bahasakita.co.id",
+      x = "",
+      y = "Frekuensi Kata"
+    ) +
+    my_theme()
+}
+```
+
+### Per Penutur
+#### Joko Widodo
+```{r}
+plot_kata(frekuensi_kata, "Joko Widodo")
+```
+
+#### Maruf Amin
+```{r}
+plot_kata(frekuensi_kata, "Maruf Amin")
+```
+
+#### Prabowo Subianto
+```{r}
+plot_kata(frekuensi_kata, "Prabowo Subianto")
+```
+
+#### Sandiaga Uno
+```{r}
+plot_kata(frekuensi_kata, "Sandiaga Uno")
+```
+
+```{r}
+frekuensi_kata_paslon <- 
+  tks_debatcapres1_2019 %>% 
+  filter(!penutur %in% c("Arief Budiman", "Pembicara")) %>% 
+  mutate(
+    penutur = case_when(
+      penutur %in% c("Joko Widodo", "Maruf Amin") ~ "Paslon 01",
+      penutur %in% c("Prabowo Subianto", "Sandiaga Uno") ~ "Paslon 02",
+      TRUE ~ "Moderator"
+    )
+  ) %>% 
+  filter(penutur != "Moderator") %>% 
+  mutate(
+    teks = str_to_lower(teks),
+    teks = str_remove_all(teks, pattern = "[:punct:]")
+  ) %>% 
+  separate_rows(teks, sep = " ") %>% 
+  filter(
+    teks != "",
+    !teks %in% stopwords_id
+  ) %>% 
+  count(penutur, teks, sort = TRUE
+  ) %>% 
+  group_by(penutur) %>% 
+  top_n(25, wt = n) %>% 
+  ungroup() %>% 
+  filter(n >= 3)
+
+frekuensi_kata_paslon
+```
+
+### Per Paslon
+#### Paslon 01
+```{r}
+plot_kata(frekuensi_kata_paslon, "Paslon 01")
+```
+
+#### Paslon 02
+```{r}
+plot_kata(frekuensi_kata_paslon, "Paslon 02")
+```
+
+## Analisis Sentimen
+### Leksikon Sentimen
+```{r}
+leksikon_sentimen <- 
+  bind_rows(
+    read_table("https://github.com/masdevid/ID-OpinionWords/raw/master/positive.txt", col_names = "teks") %>% 
+      mutate(sentimen = "Positif"),
+    read_table("https://github.com/masdevid/ID-OpinionWords/raw/master/negative.txt", col_names = "teks") %>% 
+      mutate(sentimen = "Negatif")
+  )
+leksikon_sentimen
+```
+
+### Proporsi Sentimen
+```{r}
+prop_sentimen <- 
+  tks_debatcapres1_2019 %>% 
+  filter(penutur %in% c("Joko Widodo", "Maruf Amin", "Prabowo Subianto", "Sandiaga Uno")) %>% 
+  mutate(
+    teks = str_to_lower(teks),
+    teks = str_remove_all(teks, pattern = "[:punct:]")
+  ) %>% 
+  separate_rows(teks, sep = " ") %>% 
+  filter(
+    teks != "",
+    !teks %in% stopwords_id
+  ) %>% 
+  inner_join(leksikon_sentimen) %>% 
+  group_by(penutur) %>% 
+  mutate(n_teks = length(teks)) %>% 
+  ungroup() %>% 
+  group_by(penutur, sentimen) %>% 
+  summarise(n = n(),
+            n_teks = unique(n_teks)) %>% 
+  ungroup() %>% 
+  mutate(
+    sentimen = factor(sentimen, levels = c("Positif", "Negatif")),
+    proporsi_sentimen = n/n_teks
+  )
+prop_sentimen
+```
+
+```{r}
+ggplot(prop_sentimen, aes(penutur, proporsi_sentimen, fill = sentimen)) +
+  geom_col() +
+  scale_y_continuous(labels = scales::percent) +
+scale_fill_brewer(type = "qual", palette = "Paired") +
+  labs(
+    title = "Analisis Sentimen Paslon Presiden",
+    subtitle = "Debat Pilpres 1 pada 17 Januari 2019",
+    caption = "Sumber: debatcapres.bahasakita.co.id",
+    x = "",
+    y = "Proporsi kata",
+    fill = "Sentimen") +
+  my_theme()
+```
+

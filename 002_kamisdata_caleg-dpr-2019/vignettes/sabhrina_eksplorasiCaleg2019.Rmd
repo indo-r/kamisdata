@@ -1,0 +1,227 @@
+---
+title: "Eksplorasi Data Caleg DPR 2019"
+author: "Sabhrina G. Aninta"
+date: "28 March 2019"
+output: 
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+rm(list=ls())
+getwd()
+library(dplyr)
+library(tidyverse)
+library(janitor)
+```
+
+#### Baca Data Caleg 2019
+
+Blok kode berikut adalah kode yang digunakan untuk membaca data dari repositori indo-r. Ada fungsi menarik yang berbeda dari base R yakni `readr::read_delim` yang lebih efisien daripada `utils::read.delim`yang sudah ada di R dasar dan fungsi `janitor::clean_names()` yang membersihkan judul kolom dengan sangat cepat. Buat yang belum tahu `janitor` kayak saya, biasanya bersihin colnames pake `base::gsub` dan kawan-kawan `grep`nya.
+
+```{r bacaData, message=FALSE}
+download.file("https://raw.githubusercontent.com/seuriously/caleg_dpr_2019/master/caleg_dpr.csv", destfile = "input/caleg_dpr_2019.csv") # saya membuat folder input untuk semua data masuk yang akan diproses untuk memisahkan yang raw dengan yang sudah ditransformasi 
+
+caleg<-read_delim("input/caleg_dpr_2019.csv", delim = "|", na = c("", "NA", "-"))
+glimpse(caleg)
+caleg<-caleg %>%  select(
+    partai,
+    provinsi,
+    Dapil,
+    No..Urut,
+    Nama.Lengkap,
+    Jenis.Kelamin,
+    Gelar.Akademis.Depan,
+    Gelar.Akademis.Belakang,
+    Pendidikan,
+    Pekerjaan,
+    kota_tinggal,
+    Tempat.Lahir,
+    Tanggal.Lahir,
+    umur,
+    Agama,
+    Status.Perkawinan,
+    Jumlah.Anak,
+    Motivasi,
+    Status.Khusus
+  ) %>%
+  clean_names()
+```
+
+Dari hasil pembersihan data, tampak bahwa sebagian besar variabel berjenis string sehingga saya memfaktorkan beberapa variabel yang tampaknya menarik dianalisis sebagai faktor.
+
+```{r lihatVar}
+glimpse(caleg)
+
+## biar asik ada beberapa variabel yang difaktorkan
+caleg_2019<-caleg %>% mutate(partai=as.factor(partai),
+                                  provinsi=as.factor(provinsi),
+                                  dapil=as.factor(provinsi),
+                                  jenis_kelamin=as.factor(jenis_kelamin),
+                                  gelar_akademis_depan=as.factor(gelar_akademis_depan),
+                                gelar_akademis_belakang=as.factor(gelar_akademis_belakang),
+                                  pendidikan=as.factor(pendidikan),
+                                  pekerjaan=as.factor(pekerjaan),
+                                  kota_tinggal=as.factor(kota_tinggal),
+                                  tempat_lahir=as.factor(tempat_lahir),
+                                  tanggal_lahir=as.Date(tanggal_lahir),
+                                  agama=as.factor(agama),
+                                  status_perkawinan=as.factor(status_perkawinan),
+                                  jumlah_anak=as.factor(jumlah_anak))
+
+glimpse(caleg_2019)
+```
+
+#### Cek Data
+
+Yang selalu saya lakukan sebelum memulai eksplorasi dan analisis data adalah melihat apakah dalam data ada duplikat. Hal ini saya lakukan dengan melihat jumlah baris menggunakan `nrow()` dan  membandingkannya dengan jumlah baris yang unik menggunakan `distinct()`
+
+```{r cekData}
+## Lihat jumlah caleg secara umum
+caleg_2019 %>% distinct() %>% summarise(n=n())
+
+## Berapakah jumlah entri duplikat jika ada?
+nrow(caleg_2019)-caleg_2019 %>% distinct() %>% summarise(n=n())
+
+## Bagaimanakah tampilan data duplikat?
+head(caleg_2019[duplicated(caleg_2019)==T,])
+
+## Entri keberapakah yang duplikat?
+which(duplicated(caleg_2019))
+
+## Lokasi duplikat cukup tersebar, mari lihat salah satu bagian
+caleg_2019[559:571,]
+```
+
+Dari hasil cek duplikat, ternyata hanya ada 6759 baris data yang unik dari 7634 total baris dalam set data. Entri duplikat ini sebagian besar adalah data yang ada nama partai, provinsi, dan kota tempat tinggal tapi tidak ada nomor urut dan nama. Mungkinkah ada kesalahan dalam pembacaan url? Saya sudah masukkan isu ini ke [github penyedia data](https://github.com/seuriously/caleg_dpr_2019/issues/2).
+
+Untuk membuat analisis lebih baik, semua baris yang mengandung NA dan duplikat saya hilangkan
+
+```{r rmNA}
+caleg2019_clean<-caleg_2019[complete.cases(caleg_2019),]
+dim(caleg2019_clean)
+```
+
+Hanya 403 caleg yang memberikan informasi lengkap! Sebagian besar partai memiliki di bawah 20% calegnya mengisi form dengan lengkap, namun perlu diperhatikan bahwa ini masih tergantung kepada seberapa bersih data dibaca dari website KPU; **siapa tahu ada kesalahan dalam pembacaan data**
+
+```{r siapaSerius}
+## Mau lihat dari partai mana caleg2 serius ini
+calegSerius<-caleg2019_clean %>% group_by(partai) %>% summarise(n=n())
+calegSemua<-caleg_2019 %>% group_by(partai) %>% summarise(n=n())
+calegSeriusPerSemua<-left_join(calegSerius,calegSemua,by="partai")
+calegSeriusPerSemua %>% mutate(persentase=(n.x/n.y)*100)
+
+## Mau lihat dari nomor urut mana
+caleg2019_clean %>% group_by(no_urut) %>% count(partai)
+
+```
+
+#### Eksplorasi Data: Seberapa "Terdidik" Caleg Kita?
+
+Yang mungkin menarik untuk dilihat adalah bagaimana distribusi tingkat pendidikan. Gelar akademis membutuhkan pengulikan tersendiri karena penulisan gelar tidak standar (ternyata masih banyak caleg kita yang belum paham ejaan yang disempurnakan).
+
+```{r eksplorPendidikan}
+## Lihat caleg berdasarkan pendidikan
+caleg2019_clean %>% group_by(pendidikan) %>% summarise(n=n())
+caleg2019_clean %>% group_by(gelar_akademis_depan) %>% summarise(n=n())
+caleg2019_clean %>% group_by(gelar_akademis_belakang) %>% summarise(n=n())
+## ternyata untuk gelar_akademis_depan termasuk gelar nonakademik sehingga harus dibersihkan
+
+## Coba lihat siapa saja yang tidak isi kolom pendidikannya
+caleg2019_clean %>% group_by(pendidikan) %>% count(gelar_akademis_belakang)
+```
+
+Karena itu, saya mau melihat korelasi antara provinsi asal dengan pendidikan, serta jumlah caleg terbanyak di mana.
+
+```{r pengaturanGrafik, include=F}
+## bikin tema plot dulu
+library(extrafont)
+font_import()
+loadfonts(device = "win")
+theme_caleg<-theme_bw() +
+  theme(text = element_text(family = "Lato")) +
+  theme(axis.text = element_text(size=10,colour = "black")) +
+  theme(axis.title = element_text(size=12, colour = "black", face="bold")) +
+  theme(axis.title.x = element_text(margin = margin(t=15,r=0,b=0,l=0))) +
+  theme(axis.title.y = element_text(margin = margin(t=0,r=15,b=0,l=0))) +
+  theme(title = element_text(size=18)) +
+  theme(legend.title = element_text(size=12)) +
+  theme(legend.text = element_text(size=10)) +
+  theme(plot.margin=unit(c(0.5,0.5,1,1),"lines")) +
+  theme(panel.grid = element_blank())
+```
+
+```{r bikinGrafik, fig.height = 5, fig.width =7}
+# baru bikin grafik
+caleg2019_clean %>% count(pendidikan,provinsi) %>% ggplot() +
+  geom_tile(aes(y=provinsi, x=pendidikan, fill=n)) +
+  theme_caleg +
+  theme(plot.margin = margin(.1,.1,.1,.1, "cm"))
+```
+
+Ternyata caleg terbanyak adalah caleg Jawa Barat dan Jawa Timur berpendidikan S2, sisanya tersebar cukup rata. Sebagian besar caleg adalah S1 dan S2, sementara caleg yang berpendidikan lebih rendah dari D4/S1 hanya ada dari Jawa: apakah ini masalah kepedean atau kesempatan?
+
+#### Motivasi Para Caleg
+
+Nah, sebagian besar caleg kita kan berpendidikan tinggi nih, mau tahu dong yang menjadi motivasi para caleg kita apa. Kata yang paling banyak digunakan dalam menulis motivasi dapat ditampilkan dalam awan kata.
+
+```{r analisisKata, message=FALSE}
+library(tm)
+library(SnowballC)
+library(wordcloud)
+library(RColorBrewer)
+
+# Buat file katanya
+calegMotivasi<-caleg2019_clean %>% select(motivasi)
+calegMotivasi<-Corpus(VectorSource(calegMotivasi))
+# inspect(calegMotivasi) (untuk melihat keseluruhan teks yang diubah menjadi corpus)
+
+# membersihkan korpus
+toSpace <- content_transformer(function (x , pattern ) gsub(pattern, " ", x))
+calegMotivasi <- tm_map(calegMotivasi, toSpace, "/")
+calegMotivasi <- tm_map(calegMotivasi, toSpace, "@")
+calegMotivasi <- tm_map(calegMotivasi, toSpace, "\\|")
+
+# mengubah teks ke lower case
+calegMotivasi <- tm_map(calegMotivasi, content_transformer(tolower))
+# menghilangkan angka
+calegMotivasi <- tm_map(calegMotivasi, removeNumbers)
+# menghilangkan kata-kata yang terlalu umum
+calegMotivasi <- tm_map(calegMotivasi, removeWords, c("di", "ke", "dari", "dan", "karena", "maka", "untuk","yang", "ada", "agar", "supaya", "ini", "itu", "pada", "turut", "ikut", "ingin", "dalam", "melalui", "sebagai", "dengan", "bagi", "saya", "kepada", "serta"))
+# menghilangkan tanda baca
+calegMotivasi <- tm_map(calegMotivasi, removePunctuation)
+# menghilangkan ruang spasi ekstra
+calegMotivasi <- tm_map(calegMotivasi, stripWhitespace)
+# Text stemming
+calegMotivasi <- tm_map(calegMotivasi, stemDocument)
+
+## Membuat matriks istilah
+motivasi <- TermDocumentMatrix(calegMotivasi)
+m <- as.matrix(motivasi)
+v <- sort(rowSums(m),decreasing=TRUE)
+d <- data.frame(word = names(v),freq=v)
+head(d, 10)
+
+## Buat awan kata
+set.seed(1234)
+wordcloud(words = d$word, freq = d$freq, min.freq = 30,
+          max.words=200, random.order=FALSE, rot.per=0.35, 
+          colors=brewer.pal(8, "Dark2"))
+
+## tentu saja indonesia banyak dikatakan, apalagi masyarakat dan rakyat karena mereka mendulang suara. bagaimana jika kata2 yang terlalu umum dalam data set dihilangkan?
+calegMotivasi <- tm_map(calegMotivasi, removeWords, c("indonesia","masyarakat","rakyat", "negara","bangsa"))
+motivasi2 <- TermDocumentMatrix(calegMotivasi)
+m2 <- as.matrix(motivasi2)
+v2 <- sort(rowSums(m2),decreasing=TRUE)
+d2 <- data.frame(word = names(v2),freq=v2)
+
+wordcloud(words = d2$word, freq = d2$freq, min.freq = 25,
+          max.words=200, random.order=FALSE, rot.per=0.6, 
+          colors=brewer.pal(8, "Dark2"))
+
+```
+
+Kata yang paling banyak muncul setelah kata "indonesia", "masyarakat", "rakyat", "negara", dan "bangsa" dihilangkan ternyata adalah "politik", disusul "partai" dan "prabowo". Mungkin konteks penggunaan kata akan lebih menarik dilihat dengan membaca motivasi caleg langsung.
+
+```{r jumlahKata}
+head(d2,10)
+```

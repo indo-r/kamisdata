@@ -1,0 +1,94 @@
+---
+title: "Analisis Konten Debat Pilpres Pertama"
+author: "Sabhrina G. Aninta"
+date: "31 March 2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+getwd()
+rm(list=ls())
+```
+
+Untuk mendapatkan data transkripsi debat pilpres pertama, saya berusaha mengakses data tersebut melalui package `nusandata` tapi ternyata package ini belum ada untuk versi R saya (3.5.3). Karena itu, saya akan menggunakan data dari file .rda yang ada dalam [repo kamis data 003](https://github.com/indo-r/003_kamisdata_Debat-Pilpres1-2019).
+
+```{r bacaTranskrip}
+library(dplyr)
+# load("D:/Master/Rcourse/indo-r/003_kamisdata_Debat-Pilpres1-2019/data/debat-pilpres1-2019.rda")
+load("../data/debat-pilpres1-2019.rda")
+glimpse(tks_debatcapres1_2019)
+
+```
+
+Hasil transkripsi ini dapat diubah ke dalam bentuk tidy text.
+
+```{r tidyTranskrip}
+library(tidytext)
+
+## membuat tidytext
+prabowo <- tks_debatcapres1_2019 %>% filter(.$penutur=="Prabowo Subianto")
+prabowo_df<-tibble(line=1:nrow(prabowo), teks=prabowo$teks)
+
+jokowi <- tks_debatcapres1_2019 %>% filter(.$penutur=="Joko Widodo")
+jokowi_df<-tibble(line=1:nrow(jokowi), teks=jokowi$teks)
+
+## unnest token dalam prabowo dan jokowi
+p_df<-prabowo_df %>% unnest_tokens(kata, teks)
+j_df<-jokowi_df %>% unnest_tokens(kata, teks)
+
+## melihat kata yang paling sering dikatakan
+head(prabowo_df)
+p_df %>% count(kata, sort=T)
+j_df %>% count(kata, sort=T)
+```
+
+Dari frekuensi kata tertinggi, banyak kata yang tidak memiliki makna dan hanya merupakan kata depan atau kata penghubung. Kata-kata semacam ini dalam bahasa Inggris disebut "*stopwords*" dan daftar kata semacam ini sudah banyak dalam bahasa Inggris. Package ini tidak memuat daftar *stopwords* dalam bahasa Indonesia sehingga perlu kita tetapkan sendiri. Untungnya, sudah ada yang membuat daftar *stopwords* dalam bahasa Indonesia di GitHub.
+
+```{r transkripBersih}
+library(tidyverse)
+stopwords_indo <- read_csv("https://raw.githubusercontent.com/masdevid/ID-Stopwords/master/id.stopwords.02.01.2016.txt", col_names = "stopword")
+
+p_df_tidy <- p_df %>% anti_join(y=stopwords_indo,by=c("kata"="stopword"))
+p_df_tidy %>% count(kata, sort=T) %>% filter(n > 5) %>%
+  mutate(kata = reorder(kata, n)) %>%
+  ggplot(aes(kata, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+j_df_tidy <- j_df %>% anti_join(y=stopwords_indo,by=c("kata"="stopword"))
+j_df_tidy %>% count(kata, sort=T) %>% filter(n > 5) %>%
+  mutate(kata = reorder(kata, n)) %>%
+  ggplot(aes(kata, n)) +
+  geom_col() +
+  xlab(NULL) +
+  coord_flip()
+```
+
+Karena bahasa lisan, ada stopword yang tidak sesuai dengan bahasa tulis semisal "ya". Akan lebih menarik jika kedua calon presiden dianalisis secara bersamaan untuk melihat korelasi kecenderungan penggunaan kata.
+
+```{r analisisKedua}
+## menggabungkan kedua calon presiden
+p.j<-bind_rows(mutate(p_df_tidy, penutur="PrabowoSubianto"),
+               mutate(j_df_tidy, penutur="JokoWidodo")) %>%  count(penutur, kata) %>% group_by(penutur) %>%  mutate(proporsi = n / sum(n)) %>% select(-n) %>% spread(penutur,proporsi)
+
+p.j
+
+library(scales)
+p.j %>% filter(complete.cases(.)) %>% ggplot(aes(x=JokoWidodo,y=PrabowoSubianto)) +
+  geom_abline(color = "gray40", lty = 2) +
+  geom_jitter(alpha = 0.1, size = 2.5, width = 0.3, height = 0.3) +
+  geom_text(aes(label = kata), check_overlap = TRUE, vjust = 1.5) +
+  scale_x_log10(labels = percent_format()) +
+  scale_y_log10(labels = percent_format()) +
+  scale_color_gradient(low = "darkslategray4", high = "gray75") +
+  theme(legend.position="none")
+
+```
+
+Kata yang dekat dengan garis putus-putus menunjukkan kata yang memiliki frekuensi sama dituturkan oleh kedua belah pihak.
+
+```{r corTest}
+cor.test(p.j$PrabowoSubianto,p.j$JokoWidodo)
+```
+
+*Analisis ini mengikuti contoh dari chapter pertama ["Text Mining with R"](https://www.tidytextmining.com)*
