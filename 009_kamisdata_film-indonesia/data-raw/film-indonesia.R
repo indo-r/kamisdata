@@ -70,7 +70,9 @@ film_teratas <-
       ranking_year == 2019 ~ 40000,
       TRUE ~ NA_real_
     ),
-    rating = str_extract(rating, pattern = "\\d\\.\\d|\\d"),
+    rating = rating %>% 
+      str_extract(pattern = "\\d\\.\\d|\\d") %>% 
+      as.double(),
     synopsis = synopsis,
     details = details
   ) %>% 
