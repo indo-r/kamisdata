@@ -1,0 +1,36 @@
+---
+title: "kamisdata: Analisis Instagram Tirto"
+author: "Author: IFN"
+output: 
+  html_document:
+    theme: paper
+    toc : true
+    toc_float:
+      collapsed: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Latar Belakang
+
+Instagram sudah menjadi *social media* yang tidak dapat dilepaskan keseharian (walau saya tidak punya akun IG, hehe). Kegiatan `kamisdata` kali ini menarik secara personal, karena saya tidak pernah mengolah data IG. Saya pikir, IG secara dasar memiliki pola interaksi yang sama dengan *social media* yang lain dengan menonjolkan posting, caption, hastag, mention, dan comment. Tapi fitur foto dan video penyampaiannya cukup efektif jika dibandingkan dengan platform lain seperti Facebook dan Twitter. 
+
+## Tujuan Analisis
+
+Setiap analisis ada baiknya jika dimulai dengan bertanya, yang kemudian coba kita jawab dengan analisis kita. Pertanyaan besar kali ini yang muncul adalah:
+
+### Pertanyaan 1
+
+Bagaimana 
+
+
+## Analisis Data
+
+### Data Import
+
+```{r}
+load('../data/tirto_posts.rda')
+```
+
