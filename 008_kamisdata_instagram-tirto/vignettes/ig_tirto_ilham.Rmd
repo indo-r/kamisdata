@@ -1,13 +1,13 @@
 ---
-title: "kamisdata: Analisis Instagram Tirto"
-author: "Author: IFN"
-output: 
+title: 'kamisdata: Analisis Instagram Tirto'
+author: 'Author: IFN'
+output:
   html_document:
+    df_print: paged
     theme: paper
-    df_print: paged 
-    toc : true
+    toc: yes
     toc_float:
-      collapsed: false
+      collapsed: no
 ---
 
 ```{r setup, include=FALSE}
@@ -181,7 +181,7 @@ combined_df %>%
 
 Aktifitas posting admin IG dan user yang mengirimkan komen tidak dalam pola yang sama. Dengan mengasumsikan admin tirto memiliki jam kerja normal (8-18) maka wajar jika tidak ada postingan IG tirto pada jam 1 pagi walau banyak user yang memberikan komen. Sebaliknya, admin tirto yang posting pada jam 18, cenderung tidak mendapatkan respon banyak karena user sudah tidak aktif pada jam itu.
 
-### Response Time
+### Diskusi
 
 Hal lain yang menarik bagi saya adalah seberapa lama user engaged dalam suatu post? Hal ini dapat dilihat dari jarak posting terhadap komentar-komentar yang dikirimkan oleh user. Semakin lama jarak waktu antara posting dan comment maka itu dapat diartikan posting IG tersebut memiliki engagement yang besar. 
 
@@ -223,3 +223,33 @@ tirto_posts_df %>%
   arrange(-median_time, -sd_time) %>%
   top_n(8)
 ```
+
+#### Rasio Jumlah Diskusi per Unique Username
+
+Tirto merupakan portal berita yang sering mengundang diskusi bagi para user, sehingga menarik jika mengkaji postingan mana yang mengundang user untuk diskusi. Metrik ini dapat dilihat dengan rasio antara jumlah komentar per jumlah unique username. Sehingga akan terlihat, secara rata-rata per satu username berapa banyak yang ditulis. Oleh karena itu, kita harus menghitung unique username.
+
+```{r}
+unique_length <- function(x) {
+  length(unique(x))
+}
+
+unique_commentators <- unlist(map(tirto_posts$comments_username, unique_length))
+unique_commentators_ratio <- tirto_posts$n_comments / unique_commentators
+
+tirto_posts_df$comment_ratio <- unique_commentators_ratio
+
+tirto_posts_df %>% 
+  ggplot(aes(x = comment_ratio)) + geom_histogram(bins = 50) +
+  plot_theme + labs(x = "Comment Ratio", y = "Count")
+```
+
+Dari histogram diatas dapat dilihat, ada beberapa posting yang memiliki comment ratio yang besar, yaitu diatas 4. Kita juga dapat mengamati comment ratio yang tidak terlalu besar berkisar diatas 2. Kali ini kita akan mengurutkan posting yang memiliki comment ratio diatas 2, berdasarkan yang paling banyak mengundang diskusi 
+
+```{r}
+tirto_posts_df %>%
+  filter(comment_ratio > 2) %>%
+  arrange(-comment_ratio) %>%
+  select(caption, comment_ratio)
+```
+
+Jika dilihat secara sekilas maka topik yang banyak mengundang diskusi pada IG Tirto adalah yang bertema islam, fenimisme, dan LGBTQ. Ketiga hal ini pula yang mengundang banyak diskusi di dalam masyarakat dan media massa. Sehingga tidak heran ketiga hal tersebut menjadi hal yang banyak didiskusikan di dalam IG Tirto.
