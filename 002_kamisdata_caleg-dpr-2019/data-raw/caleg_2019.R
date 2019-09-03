@@ -31,5 +31,3 @@ caleg_dpr_2019 <-
 caleg_dpr_2019
 
 save(caleg_dpr_2019, file = "002_kamisdata_caleg-dpr-2019/data/caleg_dpr_2019.rda", compress = "bzip2", compression_level = 9)
-
-write_csv(caleg_dpr_2019, "002_kamisdata_caleg-dpr-2019/data/caleg_dpr_2019.csv")

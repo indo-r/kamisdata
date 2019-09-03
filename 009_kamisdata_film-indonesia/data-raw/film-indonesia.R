@@ -85,5 +85,3 @@ film_teratas <-
 film_teratas
 
 save(film_teratas, file = "009_kamisdata_film-indonesia/data/film_teratas.rda", compress = "bzip2", compression_level = 9)
-
-write_csv(film_teratas, "009_kamisdata_film-indonesia/data/film_teratas.csv")

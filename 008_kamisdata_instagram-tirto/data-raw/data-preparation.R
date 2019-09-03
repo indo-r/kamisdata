@@ -60,5 +60,3 @@ tirto_comments <-
 tirto_comments
 
 save(tirto_comments, file = "008_kamisdata_instagram-tirto/data/tirto_comments.rda", compress = "bzip2", compression_level = 9)
-
-write_csv(tirto_comments, "008_kamisdata_instagram-tirto/data/tirto_comments.csv")

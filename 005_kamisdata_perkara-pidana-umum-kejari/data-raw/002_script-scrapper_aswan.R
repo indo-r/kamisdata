@@ -73,5 +73,3 @@ perkara_pidana <-
   )
 
 save(perkara_pidana, file = "005_kamisdata_perkara-pidana-umum-kejari/data/perkara_pidana.rda", compress = "bzip2", compression_level = 9)
-
-write_csv(perkara_pidana, "005_kamisdata_perkara-pidana-umum-kejari/data/perkara_pidana.csv")
