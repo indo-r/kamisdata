@@ -1,5 +1,7 @@
 library(tidyverse)
 library(rvest)
+# remotes::install_github("moodymudskipper/unglue")
+library(unglue)
 library(furrr)
 
 plan(multiprocess)
