@@ -1,0 +1,103 @@
+---
+title: 'kamisdata: Analisis Data Film Indonesia'
+author: "IFN"
+date: "9/8/2019"
+output: 
+  html_document:
+    df_print: paged
+    theme: paper
+    toc: yes
+    toc_float:
+      collapsed: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+```
+
+## Import Data
+
+```{r}
+load('../data/filmindonesia.rda')
+```
+
+Dengan membuka `.rda` file dari `kamisdata` maka, di dalam environment kita akan muncul objek `filmindonesia` yang sudah disiapkan dan dibersihkan oleh `aswansyahputra`.
+
+## Data Examination 
+
+```{r}
+names(filmindonesia)
+
+dim(filmindonesia)
+
+colSums(is.na(filmindonesia))
+
+colSums(is.na(filmindonesia)) / nrow(filmindonesia) * 100
+```
+
+Secara sekilas dari data yang ada 13 kolom dan 3993 baris. 13 kolom itu merepresentasikan dengan nama kolom:
+
+- `title`
+- `genre` 
+- `year`
+- `release_date`
+- `colour`
+- `duration`
+- `classification`
+- `rating`
+- `synopsis`
+- `producer`
+- `director`
+- `actress`
+- `writer`
+
+Pada data ini juga terdapat data `NA` yang jumlahnya berbeda-beda. Jumlah paling banyak terdapat pada kolom `classification` yaitu sebanyak 2861 data point (71.65%), kemudian `release_date` sebanyak 2684 data point (66.32%), dan `rating` sebanyak 2420 data point (60.61%). Karena data `NA` yang cukup besar, maka ketiga kolom tersebut akan di drop dari analisis.
+
+## Analisis 
+
+### Package
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+```
+
+### Tema Grafik
+
+Saya akan menggunakan plot dari package `ggplot2`.Agar terlihat lebih rapi saya akan buat tema sederhana biar lebih enak dilihat. 
+
+```{r}
+plot_theme <- theme(legend.position = 'top', 
+                    panel.background = element_rect(fill = 'white'), 
+                    panel.grid.major = element_line(colour = 'grey'),
+                    panel.grid.minor = element_line(colour = 'grey',
+                                                    linetype = 3), 
+                    panel.border = element_rect(colour = 'black', 
+                                                fill = NA), 
+                    plot.title = element_text(hjust = 0.5))
+```
+
+
+### Perkembangan Produksi Film Indonesia
+
+Hal yang paling mudah dilihat adalah berapa banyak film yang diproduksi di Indonesia untuk mengukur produktivitas film Indonesia.
+
+```{r}
+filmindonesia %>%
+  count(year) %>%
+  ggplot(aes(x = year, y = n)) +
+  geom_point(alpha = 0.5) +
+  geom_line() +
+  scale_x_continuous(breaks = seq(1925, 2020, by = 5)) +
+  plot_theme +
+  labs(x = 'Tahun', y = 'Jumlah Film yang Diproduksi', 
+       title = 'Tren Produksi Film Indonesia Per Tahun \nPeriode 1926-2019')
+```
+
+Visualisasi diatas, berdasarkan produksi, film di Indonesia dapat dikategorikan menjadi 4 fase.
+
+- Fase pertama adalah sebelum merdeka (1926 - 1945), pada periode tersebut awal-awal Indonesia memiliki sedikit film, dan mengalami lonjalan pada tahun 1940-1941. Hal ini menarik dikaji, karena lonjakan tersebut tidak terjadi lama. 
+- Fase kedua terdapat antara tahun 1945 - 1970. Pada periode tersebut diawali dengan pertumbuhan film yang tinggi. Kemungkinan disebabkan oleh Indonesia yang sudah merdeka dan naiknya permintaan akan film lokal. Puncak produktivitas film terjadi pada kisaran tahun 1955 dimana setelah itu tren industri perfilm-an turun kembali. 
+- Fase ketiga dimulai pada tahun 1970an hingga tahun 2000an. Periode ini bertahan lebih lama daripada dua periode sebelumnya karena pada periode ini pula Indonesia mengalami pertumbuhan ekonomi yang cukup pesat sehingga daya beli masyarakat naik. Fase ini mengalami penurunan pada awal era 90-an. Hal ini diperparah dengan adanya krisis ekonomi yang menyebabkan daya beli dan produksi turun secara drastis.
+- Fase terakhir berawal dari tahun 2000an, dimana setelah krisis ekonomi perlahan pudar. Animo menonton film lokal Indonesia naik kembali. Didukung oleh pertumbuhan demografi, daya beli, dan teknologi menjadi motor utama untuk membuat film komersial. Secara rata-rata, jumlah produksi film pada periode ini jauh lebih tinggi dari ketiga periode sebelumnya. 
+
+Secara general, walau fluktuasi produksi film Indonesia cukup tinggi. Produksi film lokal mengalami tren yang positif, dimana produksi film secara agregat naik. 
