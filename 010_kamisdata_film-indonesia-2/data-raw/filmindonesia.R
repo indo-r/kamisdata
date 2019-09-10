@@ -6,7 +6,7 @@ library(furrr)
 
 plan(multiprocess)
 
-movie_year_url <- 
+movie_year_url <-
   read_html("http://filmindonesia.or.id/movie") %>% 
   html_nodes("#year-list a") %>% 
   {
@@ -15,7 +15,7 @@ movie_year_url <-
       year_url = html_attr(., "href")
     )
   } %>% 
-  mutate(n_entry = map_dbl(year_url, ~ {
+  mutate(n_entry = future_map_dbl(year_url, ~ {
     n_entry <- 
       read_html(.x) %>% 
       html_nodes("h4") %>% 
@@ -28,12 +28,12 @@ movie_year_url <-
     }
     
     return(n_entry)
-  })) %>% 
+  }, .progress = TRUE)) %>% 
   dplyr::filter(n_entry > 0) %>% 
   mutate(
-    subpage = map(n_entry, ~ {
+    subpage = future_map(n_entry, ~ {
       c(NA_real_, seq(from = 10, by = 10, length.out = (.x %/% 10)))
-    })
+    }, .progress = TRUE)
   ) %>% 
   unnest() %>% 
   transmute(
@@ -94,6 +94,7 @@ filmindonesia_raw <-
     movie_details = future_map(movie_url, parse_movie, .progress = TRUE)
   ) %>% 
   unnest()
+
 details_patterns <- c("Produser{producer}Sutradara{director}Penulis{writer}Pemeran{actress}Tanggal edar {release_date}Rasio{others}", 
                       "Produser{producer}Sutradara{director}Penulis{writer}Pemeran{actress}Tanggal edar {release_date}Warna{others}",
                       "Produser{producer}Sutradara{director}Penulis{writer}Pemeran{actress}Tanggal edar {release_date}Format{others}",
@@ -108,8 +109,8 @@ details_patterns <- c("Produser{producer}Sutradara{director}Penulis{writer}Pemer
                       "Produser{producer}Penulis{writer}Pemeran{actress}Warna{others}",
                       "Produser{producer}Warna{others}",
                       "Sutradara{director}Penulis{writer}Pemeran{actress}Tanggal edar {release_date}Warna{others}",
-                      "Sutradara{director}Penulis{writer}Pemeran{actress}",
                       "Sutradara{director}Penulis{writer}Pemeran{actress}Warna{others}",
+                      "Sutradara{director}Penulis{writer}Pemeran{actress}",
                       "Sutradara{director}Pemeran{actress}Warna{others}",
                       "Sutradara{director}Pemeran{actress}Format{others}",
                       "Sutradara{director}Pemeran{actress}",
@@ -142,6 +143,6 @@ filmindonesia <-
       TRUE ~ NA_character_
     )
   ) %>% 
-  select(title, genre, year, release_date, colour, everything(), -movie_url, -genre1, -genre2, -details1, -details2, -others)
+  select(title, genre, year, release_date, colour, duration, classification, rating, producer, director, writer, actress, synopsis)
 
 save(filmindonesia, file = "010_kamisdata_film-indonesia-2/data/filmindonesia.rda", compress = "bzip2", compression_level = 9)
