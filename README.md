@@ -1,17 +1,35 @@
-# Kamis Data R Indonesia
-[![Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)
+# Kamis Data <img src='r-indonesia.png' align="right" height="139" />
 
-Program pekanan Kamis Data dari komunitas R Indonesia
+<!-- badges: start -->
+[![Launch Rstudio Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)
+<!-- badges: end -->
+
+Program pekanan Kamis Data dari [**Komunitas R Indonesia**.](https://GNURIndonesia)
+
+## Topik dan Data Tersedia
+
+* Kamis Data 001 - Persentase Penduduk Perkotaan
+* Kamis Data 002 - Caleg DPR RI 2019
+* Kamis Data 003 - Debat Pilpres Pertama 2019
+* Kamis Data 004 - Paket Lelang Kota Bandung
+* Kamis Data 005 - Perkara Pidana Umum Kejari RI
+* Kamis Data 006 - Indonesia Database for Policy and Economic Research
+* Kamis Data 007 - Karakter Dalam Marvel Cinematic Universe
+* Kamis Data 008 - Akun Instagram Tirto
+* Kamis Data 009 - Film Indonesia Teratas 2007 - 2019
+* Kamis Data 010 - Film Indonesia Sejak 1926
+* Kamis Data 011 - Lagu Teratas di Spotify Indonesia 2018
+* Kamis Data 012 - Buku Indonesia Sepanjang Masa
 
 ## Cara Berpartisipasi
 
-1. *Fork* repositori ini
-2. Pilih topik dan direktori kamisdata yang Anda inginkan
-3. Buat direktori baru dengan nama 'vignettes' dalam direktori topik yang Anda pilih
+1. Silakan *Fork* repositori ini
+2. Pilih topik yang Anda inginkan untuk dieksplorasi dan dianalisis
+3. Buat berkas R Markdown baru dalam direktori 'vignettes' dengan format **"kode-nama-judul_analisis.Rmd"** untuk menuliskan pekerjaan Anda. Contoh: "002-sabhrina-eksplorasi_caleg_2019.Rmd"
 4. Skrip untuk mendapatkan data tersedia dalam direktori 'data-raw'. Anda dapat menggunakan skrip tersebut atau langsung menggunakan data berekstensi `rda` dalam direktori 'data'. **Jangan mengubah nama berkas dalam folder data-raw!**
-5. Silakan lakukan eksplorasi dan analisis data dengan menggunakan  dokumen R Markdown dan simpan dengan format `analis_judul.Rmd` di dalam folder 'vignettes' (contoh: aswansyahputra_dashboard-penduduk-perkotaan.Rmd)
-6. Pada YAML R Markdown gunakan output `github_document`, terkecuali R Markdown tersebut tidak dapat di *render* menjadi dokumen markdown
-7. Pada hari rabu pekan berikutnya, silakan mengajukan *Pull request* atas hasil kerja Anda. Selamat mencoba!
+5. Harap untuk mempergunakan *ouput document* berupa GitHub Document. Pada YAML *header* R Markdown silakan untuk menuliskan **`output: github_document`**. Namun jika R Markdown tersebut tidak dapat di *render* menjadi dokumen markdown, harap untuk menambahkan opsi **`keep_md: true`** pada YAML *header*
+6. Jangan lupa untuk melakukan **_knitting_** pada berkas R Markdown hasil pekerjaan Anda tersebut!
+7. Pada hari rabu pekan berikutnya, silakan mengajukan **_Pull request_** atas hasil kerja Anda. Selamat mencoba!
 
 **Catatan:** Jika Anda sebelumnya telah melakukan *forking*, silakan ikuti panduan pada pranala [ini](https://digitaldrummerj.me/git-sync-fork-to-master/) untuk melakukan sinkronisasi repositori
 
