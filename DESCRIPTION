@@ -21,7 +21,7 @@ Depends:
     rvest, 
     stringr,
     tibble,
-    tidyr
+    tidyr,
     rmarkdown,
     knitr,
     shiny,
