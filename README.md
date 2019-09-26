@@ -20,6 +20,7 @@ Program pekanan Kamis Data dari [**Komunitas R Indonesia**.](https://GNURIndones
 * Kamis Data 010 - Film Indonesia Sejak 1926
 * Kamis Data 011 - Lagu Teratas di Spotify Indonesia 2018
 * Kamis Data 012 - Buku Indonesia Sepanjang Masa
+* Kamis Data 013 - Lagu Iwan Fals
 
 ## Cara Berpartisipasi
 
