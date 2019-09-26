@@ -23,7 +23,7 @@ iwanfals_lyrics <-
   compact() %>% 
   bind_rows() %>% 
   transmute(track_name = song_name, lyric = line) %>% 
-  nest(lyric = lyric)
+  chop(lyric)
 
 iwanfals_music_features_raw <- get_artist_audio_features("Iwan Fals", include_groups = c("album", "single")) %>% 
   as_tibble()
