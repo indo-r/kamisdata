@@ -8,10 +8,6 @@ library(furrr)
 
 plan(multiprocess)
 
-geniusr::search_artist(search_term = "Iwan")
-geniusr::search_artist()
-get_artist_songs("362605")
-
 iwanfals_lyrics_raw <- 
   get_artist_songs("356464") %>%
   pull(song_id) %>% 
