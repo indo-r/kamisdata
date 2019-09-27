@@ -1,5 +1,5 @@
 # Contributor: Muhammad Aswan Syahputra
-# Source: Genius.com dan Spotify
+# Source: Genius.com and Spotify
 
 library(geniusr)
 library(spotifyr)
@@ -9,7 +9,7 @@ library(furrr)
 plan(multiprocess)
 
 iwanfals_lyrics_raw <- 
-  get_artist_songs("356464") %>%
+  get_artist_songs("356464") %>% # artist_id for Iwan Fals
   pull(song_id) %>% 
   future_map(safely(scrape_lyrics_id), .progress = TRUE)
 
@@ -26,7 +26,10 @@ iwanfals_music_features_raw <- get_artist_audio_features("Iwan Fals", include_gr
 
 iwanfals <- 
   iwanfals_music_features_raw %>% 
-  inner_join(iwanfals_lyrics) %>% 
-  select(track_name, duration_ms, album_name, album_release_date, album_release_year, danceability:tempo, key_mode, lyric, -key)
+  left_join(iwanfals_lyrics) %>% 
+  mutate(
+    lyric = ifelse(map_lgl(lyric, is.null), NA_character_, lyric)
+  ) %>% 
+  select(track_name, duration_ms, album_name, album_release_date, album_release_year, danceability:tempo, key_mode, lyric)
 
 save(iwanfals, file = "data/iwanfals.rda", compress = "bzip2", compression_level = 9)
