@@ -4,7 +4,7 @@
 [![Launch Rstudio Binder](http://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/indo-r/kamisdata/master?urlpath=rstudio)
 <!-- badges: end -->
 
-Program pekanan Kamis Data dari [**Komunitas R Indonesia**.](https://GNURIndonesia)
+Program pekanan Kamis Data dari [**Komunitas R Indonesia**.](https://r-indonesia.id/)
 
 ## Topik dan Data Tersedia
 
