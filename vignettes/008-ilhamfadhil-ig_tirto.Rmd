@@ -1,0 +1,255 @@
+---
+title: 'kamisdata: Analisis Instagram Tirto'
+author: 'Author: IFN'
+output: github_document
+  # html_document:
+  #   df_print: paged
+  #   theme: paper
+  #   toc: yes
+  #   toc_float:
+  #     collapsed: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+```
+
+## Import Data
+
+```{r}
+load('../data/tirto_posts.rda')
+```
+
+Karena kita `load` data `.rda` maka di dalam environment kita ada objek baru bernama `tirto_post`. Saya tidak terbayang seberapa besar. Karena itu saya mau lihat variabel apa saja yang ada, berapa besar dimensinya, dan isinya seperti apa?
+
+### Data Examination
+
+```{r}
+names(tirto_posts) # melihat nama kolom
+dim(tirto_posts) # melihat jumlah kolom
+head(tirto_posts) # melihat data-data teratas
+```
+
+Secara sekilas dari data yang ada 12 kolom dan 300 baris. 12 kolom itu merepresentasikan dengan nama kolom:
+
+- `id` nomor urut data
+- `post_time` waktu posting di IG, tanggal, jam, menit, dan detik
+- `is_video` apakah postingnya berupa video
+- `caption` caption apa yang digunakan di dalam posting
+- `tags` tags apa yang digunakan di dalam posting
+- `n_tags` berapa banyak tags
+- `video_view` berapa banyak video dilihat
+- `media_like` 
+- `comments_username` siapa saja yang comment di dalam posting
+- `comment_time` tanggal, jam, menit dan detik berapa comment terjadi
+- `comments_text` apa yang dikomen
+- `n_comments` berapa banyak komen di satu posting?
+
+Ada beberapa hal yang dapat dilihat dari hasil diatas:
+
+- Pada nama kolom `video_view` ada data `NA`. Ini kemungkinan disebabkan karena posting yang tidak mengandung video tidak ada datanya.
+- Pada kolom `comment_username`, `comment_time`, dan `comment_text` isi adanya `<chr[angka]>`. Ini menandakan bahwa satu kolom data ada list variabel sepanjang `angka` dengan jenis character. Data ini disebabkan satu posting ada kemungkinan menyimpan lebih dari satu komen. Agar lebih rapi, data tersebut diubah menjadi list variable dan disimpan dalam satu baris yang sama dengan posting awal. 
+
+## Analisis Data
+
+Kali ini bisa dibilang bukan kamisdata saya yang pertama, tapi ini kamisdata yang pertama saya selesaikan `r emo::ji('smile')`. Jadi, sekarang buat analisis yang sederhana-sederhana aja.
+
+### Package
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate) # untuk bekerja dengan data waktu
+library(purrr) # untuk fungsi iterasi fungsi
+library(gridExtra)
+```
+
+### Tema Grafik
+
+Karena nanti akan banyak menggunakan plot `ggplot2`, saya akan buat tema sederhana biar lebih enak dilihat. 
+
+```{r}
+plot_theme <- theme(legend.position = 'top', 
+                    panel.background = element_rect(fill = 'white'), 
+                    panel.grid.major = element_line(colour = 'grey'),
+                    panel.grid.minor = element_line(colour = 'grey',
+                                                    linetype = 3), 
+                    panel.border = element_rect(colour = 'black', 
+                                                fill = NA), 
+                    plot.title = element_text(hjust = 0.5))
+```
+
+
+### Posting dan Komentar
+
+Fitur pertama yang langsung menarik perhatian saya adalah interaksi pembaca IG tirto yang dilihat dari jumlah komen secara waktu. Apakah ada pola tertentu? Tapi harus diingat bahwa posting tirto tidak ada pola, sehingga mungkin juga tidak membentuk pola tertentu karena ada kemungkinan pembaca lebih engage dengan posting beritanya.
+
+```{r}
+ggplot(tirto_posts, aes(x = post_time, y = n_comments)) + 
+  geom_point() + geom_line() + 
+  labs(x = 'Waktu Posting',
+       y = 'Jumlah Komentar per Posting', 
+       title = 'Visualisasi Tren Jumlah Komentar Berdasarkan Tanggal Posting') + 
+  plot_theme
+```
+
+Jika dilihat dari grafik diatas, dapat ditarik kesimpulan secara waktu tidak ada pola jelas dari jumlah komentar berdasarkan tanggal postingnya. Tapi ini mungkin menjadi tidak valid, karena tanggal yang digunakan itu tanggal posting, bukan tanggal komentar dibuat. Data diatas hanya menunjukkan satu posting itu ada berapa banyak komentar saja. Bukan interaksi berdasarkan waktu. Oleh karena itu, mari kita bedah waktu user menggunggah komentar. Tapi sebelum itu, data tanggal komentar tersebut masih berupa list variabel. Sekarang kita coba lihat berdasarkan jam dan Weekend atau tidak.
+
+Secara kuantitas, hari Weekdays pasti lebih banyak daripada Weekend. Sehingga, agar seimbang, maka akan dilakukan standardisasi menjadi z-value. Agar kedua jenis hari ini dapat dibandingkan. 
+
+```{r}
+tirto_posts %>%
+  mutate(jam = hour(post_time), 
+         weekdays = weekdays(post_time), 
+         weekend = ifelse(weekdays %in% c('Sunday', 'Saturday'), 
+                          'Weekend', 'Weekdays')) %>%
+  count(jam, weekend) %>%
+  group_by(weekend) %>%
+  mutate(scale_n = scale(n)) %>%
+  ggplot(aes(x = jam, y = scale_n)) + 
+  geom_line() + geom_point() + plot_theme + facet_wrap(.~weekend) +
+  labs(x = 'Jam Posting', 
+       y = 'Jumlah Posting', 
+       title = 'Jam Posting IG Tirto \nBerdasarkan Weekend') +
+  scale_x_continuous(breaks = c(7:23))
+```
+
+Sekilas dapat dilihat bahwa pola posting admin IG tirto pada hari Weekdays dan Weekend memiliki pola yang berbeda. Akun IG Tirto paling banyak melakukan posting sekitar jam 8 pagi, kemudian jam 12-13 siang, dan jam 18. Hal ini mencoba menangkap pola pekerja yang masuk pada jam 8-9, istirahat pada jam 12-13, dan pulang dari kantor jam 18. Sedangkan pada hari Weekend, aktifitas posting pagi tidak berubah, malah lebih banyak posting pada sore, jam 18. 
+
+```{r}
+tanggal_komentar <- unlist(tirto_posts$comments_time)
+head(tanggal_komentar)
+tanggal_komentar <- as_datetime(tanggal_komentar)
+head(tanggal_komentar)
+```
+
+Mengelompokkan berdasarkan tanggal, jam, dan weekend
+
+```{r}
+tanggal_komentar_df <- data.frame(tanggal_komentar, 
+                                  tanggal = date(tanggal_komentar),
+                                  jam = hour(tanggal_komentar),
+                                  weekdays = weekdays(tanggal_komentar))
+head(tanggal_komentar_df)
+```
+
+```{r}
+tanggal_komentar_df %>%
+  mutate(weekend = ifelse(weekdays %in% c('Sunday', 'Saturday'), 'Weekend', 'Weekday')) %>%
+  count(jam, weekend) %>% 
+  group_by(weekend) %>%
+  mutate(scale_n = scale(n)) %>%
+  ggplot(aes(x = jam, y = scale_n)) + 
+  geom_line() + geom_point() + plot_theme + facet_wrap(.~weekend) + 
+  labs(x = 'Jam Komentar', 
+       y = 'Jumlah Komentar', 
+       title = 'Jam Aktif User Berkomentar \nBerdasarkan Weekend') +
+  scale_x_continuous(breaks = c(0:23))
+```
+
+Dari pola aktifitas comment user IG, dapat dilihat bahwa user IG memiliki pola penggunaan IG yang kurang lebih sama antara Weekdays, dan Weekend. Paling banyak user mengirimkan komentar pada jam 1 pagi, jam 6 pagi, dan jam 11-12. Pola tersebut tidak berubah pada Weekend, tapi lebih tinggi pada jam 11-12. Hal ini menarik karena, user pada Weekdays paling banyak memberikan komentar pada jam 1 dini hari, yang berarti user sedang lembur/terbangun dari tidur/nongkrong yang mendorong dia untuk membuat IG. Yang kedua, sepertinya user juga banyak membuka IG ketika dalam perjalanan ke tempat kerja. Sehingga bisa diasumsikan sebagian besar pembaca akun IG tirto adalah komuter. User ini pun tidak tertarik untuk memberikan komen ketika sudah jam pulang kantor, yaitu sekitar jam 17-18.
+
+#### Kesimpulan
+
+```{r}
+posting_df <- tirto_posts %>%
+  mutate(jam = hour(post_time), 
+         weekdays = weekdays(post_time), 
+         weekend = ifelse(weekdays %in% c('Sunday', 'Saturday'), 
+                          'Weekend', 'Weekdays')) %>%
+  count(jam, weekend) %>%
+  group_by(weekend) %>%
+  mutate(scale_n = scale(n), category = 'Posting')
+
+comment_df <- tanggal_komentar_df %>%
+  mutate(weekend = ifelse(weekdays %in% c('Sunday', 'Saturday'), 'Weekend', 'Weekdays')) %>%
+  count(jam, weekend) %>% 
+  group_by(weekend) %>%
+  mutate(scale_n = scale(n), category = 'Comment') 
+
+combined_df <- rbind(posting_df, comment_df)
+
+combined_df %>%
+  ggplot(aes(x = jam, y = scale_n, colour = category)) + 
+  geom_point() + geom_line() + facet_wrap(.~weekend) + 
+  labs(x = 'Jam', 
+       y = 'Jumlah', 
+       title = 'Jam Admin Posting dan User Aktif Berkomentar \nBerdasarkan Weekend') +
+  scale_x_continuous(breaks = c(0:23)) + plot_theme +
+  scale_color_discrete(name = 'Category')
+```
+
+
+Aktifitas posting admin IG dan user yang mengirimkan komen tidak dalam pola yang sama. Dengan mengasumsikan admin tirto memiliki jam kerja normal (8-18) maka wajar jika tidak ada postingan IG tirto pada jam 1 pagi walau banyak user yang memberikan komen. Sebaliknya, admin tirto yang posting pada jam 18, cenderung tidak mendapatkan respon banyak karena user sudah tidak aktif pada jam itu.
+
+### Diskusi
+
+Hal lain yang menarik bagi saya adalah seberapa lama user engaged dalam suatu post? Hal ini dapat dilihat dari jarak posting terhadap komentar-komentar yang dikirimkan oleh user. Semakin lama jarak waktu antara posting dan comment maka itu dapat diartikan posting IG tersebut memiliki engagement yang besar. 
+
+```{r}
+response_list <- map(tirto_posts$comments_time, as_datetime)
+
+temp <- NULL
+for (i in seq_along(response_list)) {
+  temp[[i]] <- response_list[[i]] - tirto_posts$post_time[i]
+}
+
+median_time <- data.frame(median_time = unlist(map(temp, mean)))
+sd_time <- data.frame(sd_time = unlist(map(temp, sd)))
+
+tirto_posts_df <- cbind(tirto_posts, median_time, sd_time)
+
+head(tirto_posts_df)
+
+g1 <- ggplot(tirto_posts_df, aes(y = median_time)) + 
+  geom_boxplot() + labs(y = "Median of Response Time") + 
+  plot_theme
+
+g2 <- ggplot(tirto_posts_df, aes(y = sd_time)) + 
+  geom_boxplot() + labs(y = "Standard Deviaton of Response Time") + 
+  plot_theme
+
+grid.arrange(g1, g2, ncol = 2)
+```
+
+Dapat dilihat ada outliers yang cukup besar, baik itu dari median atau standard deviasi tentang response time yang didapat dari user IG. Kedua metrik yang besar ini menunjukan bahwa tidak semua posting menghasilkan engagement yang sama bagi user. Karena ada posting yang masih mendapatkan komen walaupun masih lama, sedangkan yang lain tidak. Mari kita lihat postingan apa saja yang menghasilkan user engage. Karena dari tabel diatas hanya menghasilkan outliers diatas, maka saya akan hanya berfokus pada outliers pada bagian atas saja.
+
+```{r}
+tirto_posts_df <- tirto_posts_df %>%
+  mutate(is_out_median = ifelse(median_time > (mean(median_time) + IQR(median_time)), TRUE, FALSE), 
+         is_out_sd = ifelse(sd_time > (mean(sd_time) + IQR(sd_time)), TRUE, FALSE))
+
+tirto_posts_df %>%
+  select(caption, median_time, sd_time) %>%
+  arrange(-median_time, -sd_time) %>%
+  top_n(8)
+```
+
+#### Rasio Jumlah Diskusi per Unique Username
+
+Tirto merupakan portal berita yang sering mengundang diskusi bagi para user, sehingga menarik jika mengkaji postingan mana yang mengundang user untuk diskusi. Metrik ini dapat dilihat dengan rasio antara jumlah komentar per jumlah unique username. Sehingga akan terlihat, secara rata-rata per satu username berapa banyak yang ditulis. Oleh karena itu, kita harus menghitung unique username.
+
+```{r}
+unique_length <- function(x) {
+  length(unique(x))
+}
+
+unique_commentators <- unlist(map(tirto_posts$comments_username, unique_length))
+unique_commentators_ratio <- tirto_posts$n_comments / unique_commentators
+
+tirto_posts_df$comment_ratio <- unique_commentators_ratio
+
+tirto_posts_df %>% 
+  ggplot(aes(x = comment_ratio)) + geom_histogram(bins = 50) +
+  plot_theme + labs(x = "Comment Ratio", y = "Count")
+```
+
+Dari histogram diatas dapat dilihat, ada beberapa posting yang memiliki comment ratio yang besar, yaitu diatas 4. Kita juga dapat mengamati comment ratio yang tidak terlalu besar berkisar diatas 2. Kali ini kita akan mengurutkan posting yang memiliki comment ratio diatas 2, berdasarkan yang paling banyak mengundang diskusi 
+
+```{r}
+tirto_posts_df %>%
+  filter(comment_ratio > 2) %>%
+  arrange(-comment_ratio) %>%
+  select(caption, comment_ratio)
+```
+
+Jika dilihat secara sekilas maka topik yang banyak mengundang diskusi pada IG Tirto adalah yang bertema islam, fenimisme, dan LGBTQ. Ketiga hal ini pula yang mengundang banyak diskusi di dalam masyarakat dan media massa. Sehingga tidak heran ketiga hal tersebut menjadi hal yang banyak didiskusikan di dalam IG Tirto.

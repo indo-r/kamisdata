@@ -1,0 +1,30 @@
+Type: Compendium
+Package: kamisdata
+Title: Kamis Data
+Version: 0.1.2
+Authors@R: 
+    person(given = "Muhammad Aswan",
+           family = "Syahputra",
+           role = c("aut", "cre"),
+           email = "muhammadaswansyahputra@gmail.com")
+Description: Program pekanan Kamis Data oleh Komunitas R Indonesia 
+License: CCBY-4.0
+Depends: 
+    dplyr,
+    forcats,
+    ggplot2,
+    jsonlite,
+    lubridate,
+    magrittr,
+    purrr,
+    readr,
+    rvest, 
+    stringr,
+    tibble,
+    tidyr,
+    rmarkdown,
+    knitr,
+    shiny,
+    remotes
+Encoding: UTF-8
+LazyData: true
